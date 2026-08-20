@@ -13,21 +13,21 @@ export const PLAYLIST: SongTrack[] = [
     id: "penjaga-hati",
     title: "Penjaga Hati (Acoustic)",
     artist: "Nadhif Basalamah",
-    src: "/audio/penjaga-hati.mp3",
+    src: "/audio/penjaga-hati.wav",
     durationText: "03:45",
   },
   {
     id: "promise",
     title: "Promise (Vintage Jazz)",
     artist: "Laufey",
-    src: "/audio/promise.mp3",
+    src: "/audio/promise.wav",
     durationText: "03:54",
   },
   {
     id: "birthday-piano",
     title: "Happy Birthday (Acoustic Serenade)",
     artist: "Piano Studio",
-    src: "/audio/birthday-piano.mp3",
+    src: "/audio/birthday-piano.wav",
     durationText: "02:30",
   },
 ];
@@ -38,25 +38,32 @@ class BirthdaySoundEngine {
   private isPlaying: boolean = false;
   private currentTrackIndex: number = 0;
   private audioElement: HTMLAudioElement | null = null;
-  private ambientInterval: any = null;
   private listeners: ((playing: boolean, track: SongTrack) => void)[] = [];
 
   constructor() {
     if (typeof window !== "undefined") {
+      this.initAudioElement();
+    }
+  }
+
+  private initAudioElement() {
+    if (!this.audioElement && typeof window !== "undefined") {
       this.audioElement = new Audio();
       this.audioElement.loop = true;
-      this.audioElement.volume = 0.75;
+      this.audioElement.volume = 0.85;
+
+      this.audioElement.addEventListener("play", () => {
+        this.isPlaying = true;
+        this.notify();
+      });
+
+      this.audioElement.addEventListener("pause", () => {
+        this.isPlaying = false;
+        this.notify();
+      });
 
       this.audioElement.addEventListener("ended", () => {
         this.nextTrack();
-      });
-
-      this.audioElement.addEventListener("error", () => {
-        console.info("Falling back to built-in acoustic synthesizer");
-        // Seamless fallback to synthesizer
-        if (this.isPlaying) {
-          this.startSynthesizedAmbient();
-        }
       });
     }
   }
@@ -100,9 +107,6 @@ class BirthdaySoundEngine {
     if (this.audioElement) {
       this.audioElement.muted = this.isMuted;
     }
-    if (this.isMuted && this.isPlaying) {
-      this.stop();
-    }
     return this.isMuted;
   }
 
@@ -114,36 +118,55 @@ class BirthdaySoundEngine {
     this.currentTrackIndex = (index + PLAYLIST.length) % PLAYLIST.length;
     const track = PLAYLIST[this.currentTrackIndex];
 
+    this.initAudioElement();
     this.initContext();
     this.playNeedleDrop();
 
-    if (this.audioElement && track.src) {
+    if (this.audioElement) {
       this.audioElement.src = track.src;
-      this.audioElement
-        .play()
-        .then(() => {
-          this.isPlaying = true;
-          this.stopSynthesizedAmbient();
-          this.notify();
-        })
-        .catch(() => {
-          // If browser blocks or file not found, use synthesized ambient acoustic
-          this.isPlaying = true;
-          this.startSynthesizedAmbient();
-          this.notify();
-        });
-    } else {
-      this.isPlaying = true;
-      this.startSynthesizedAmbient();
-      this.notify();
+      this.audioElement.currentTime = 0;
+      this.audioElement.muted = this.isMuted;
+
+      const playPromise = this.audioElement.play();
+      if (playPromise !== undefined) {
+        playPromise
+          .then(() => {
+            this.isPlaying = true;
+            this.notify();
+          })
+          .catch((err) => {
+            console.warn("Audio play prevented:", err);
+            this.isPlaying = false;
+            this.notify();
+          });
+      }
     }
   }
 
   public togglePlay() {
+    this.initAudioElement();
+    if (!this.audioElement) return;
+
     if (this.isPlaying) {
-      this.stop();
+      this.audioElement.pause();
+      this.isPlaying = false;
+      this.notify();
     } else {
-      this.playTrack(this.currentTrackIndex);
+      if (!this.audioElement.src || this.audioElement.src === "" || this.audioElement.src.endsWith("/")) {
+        this.playTrack(this.currentTrackIndex);
+      } else {
+        this.initContext();
+        this.playNeedleDrop();
+        this.audioElement
+          .play()
+          .then(() => {
+            this.isPlaying = true;
+            this.notify();
+          })
+          .catch(() => {
+            this.playTrack(this.currentTrackIndex);
+          });
+      }
     }
   }
 
@@ -156,12 +179,39 @@ class BirthdaySoundEngine {
   }
 
   public stop() {
-    this.isPlaying = false;
     if (this.audioElement) {
       this.audioElement.pause();
     }
-    this.stopSynthesizedAmbient();
+    this.isPlaying = false;
     this.notify();
+  }
+
+  // UI tone generator
+  public playTone(freq: number, duration: number = 0.5, delay: number = 0, type: OscillatorType = "sine") {
+    if (this.isMuted) return;
+    this.initContext();
+    if (!this.ctx) return;
+
+    try {
+      const now = this.ctx.currentTime + delay;
+      const osc = this.ctx.createOscillator();
+      const gain = this.ctx.createGain();
+
+      osc.type = type;
+      osc.frequency.setValueAtTime(freq, now);
+
+      gain.gain.setValueAtTime(0, now);
+      gain.gain.linearRampToValueAtTime(0.08, now + 0.02);
+      gain.gain.exponentialRampToValueAtTime(0.0001, now + duration);
+
+      osc.connect(gain);
+      gain.connect(this.ctx.destination);
+
+      osc.start(now);
+      osc.stop(now + duration);
+    } catch (e) {
+      // ignore
+    }
   }
 
   // Turntable needle drop sound effect
@@ -176,10 +226,10 @@ class BirthdaySoundEngine {
       const gain = this.ctx.createGain();
 
       osc.type = "sine";
-      osc.frequency.setValueAtTime(120, now);
-      osc.frequency.exponentialRampToValueAtTime(40, now + 0.12);
+      osc.frequency.setValueAtTime(140, now);
+      osc.frequency.exponentialRampToValueAtTime(45, now + 0.12);
 
-      gain.gain.setValueAtTime(0.08, now);
+      gain.gain.setValueAtTime(0.1, now);
       gain.gain.exponentialRampToValueAtTime(0.001, now + 0.15);
 
       osc.connect(gain);
@@ -189,61 +239,6 @@ class BirthdaySoundEngine {
       osc.stop(now + 0.15);
     } catch (e) {
       // ignore
-    }
-  }
-
-  // Synthesizer Tone
-  public playTone(freq: number, duration: number = 1.0, delay: number = 0, type: OscillatorType = "sine") {
-    if (this.isMuted) return;
-    this.initContext();
-    if (!this.ctx) return;
-
-    const now = this.ctx.currentTime + delay;
-    const osc = this.ctx.createOscillator();
-    const gain = this.ctx.createGain();
-
-    osc.type = type;
-    osc.frequency.setValueAtTime(freq, now);
-
-    gain.gain.setValueAtTime(0, now);
-    gain.gain.linearRampToValueAtTime(0.16, now + 0.04);
-    gain.gain.exponentialRampToValueAtTime(0.0001, now + duration);
-
-    osc.connect(gain);
-    gain.connect(this.ctx.destination);
-
-    osc.start(now);
-    osc.stop(now + duration);
-  }
-
-  // Start synthesized warm ambient chords ("Penjaga Hati" Acoustic Progression)
-  private startSynthesizedAmbient() {
-    this.stopSynthesizedAmbient();
-    const chords = [
-      [261.63, 329.63, 392.0, 493.88], // Cmaj7
-      [220.0, 261.63, 329.63, 392.0],  // Am7
-      [174.61, 220.0, 261.63, 329.63], // Fmaj7
-      [196.0, 246.94, 293.66, 349.23], // G7
-    ];
-
-    let chordIndex = 0;
-    const playNextChord = () => {
-      if (!this.isPlaying || this.isMuted) return;
-      const chord = chords[chordIndex];
-      chord.forEach((note, nIdx) => {
-        this.playTone(note, 3.8, nIdx * 0.14, "triangle");
-      });
-      chordIndex = (chordIndex + 1) % chords.length;
-    };
-
-    playNextChord();
-    this.ambientInterval = setInterval(playNextChord, 4200);
-  }
-
-  private stopSynthesizedAmbient() {
-    if (this.ambientInterval) {
-      clearInterval(this.ambientInterval);
-      this.ambientInterval = null;
     }
   }
 
@@ -293,46 +288,34 @@ class BirthdaySoundEngine {
   // Celebratory chime
   public playCelebrationChime() {
     if (this.isMuted) return;
-    const arpeggio = [523.25, 659.25, 783.99, 1046.5, 1318.5];
-    arpeggio.forEach((freq, idx) => {
-      this.playTone(freq, 1.2, idx * 0.08, "sine");
-    });
-  }
-
-  // "Happy Birthday to You" arpeggio melody
-  public playHappyBirthdayMelody() {
-    if (this.isMuted) return;
     this.initContext();
     if (!this.ctx) return;
 
-    const notes = [
-      { f: 261.63, d: 0.3, t: 0.0 },
-      { f: 261.63, d: 0.3, t: 0.35 },
-      { f: 293.66, d: 0.6, t: 0.7 },
-      { f: 261.63, d: 0.6, t: 1.35 },
-      { f: 349.23, d: 0.6, t: 2.0 },
-      { f: 329.63, d: 1.2, t: 2.7 },
+    const arpeggio = [523.25, 659.25, 783.99, 1046.5, 1318.5];
+    arpeggio.forEach((freq, idx) => {
+      if (!this.ctx) return;
+      const now = this.ctx.currentTime + idx * 0.08;
+      const osc = this.ctx.createOscillator();
+      const gain = this.ctx.createGain();
 
-      { f: 261.63, d: 0.3, t: 4.1 },
-      { f: 261.63, d: 0.3, t: 4.45 },
-      { f: 293.66, d: 0.6, t: 4.8 },
-      { f: 261.63, d: 0.6, t: 5.45 },
-      { f: 392.0, d: 0.6, t: 6.1 },
-      { f: 349.23, d: 1.2, t: 6.75 },
+      osc.type = "sine";
+      osc.frequency.setValueAtTime(freq, now);
 
-      { f: 261.63, d: 0.3, t: 8.2 },
-      { f: 261.63, d: 0.3, t: 8.55 },
-      { f: 523.25, d: 0.7, t: 8.9 },
-      { f: 440.0, d: 0.7, t: 9.65 },
-      { f: 349.23, d: 0.6, t: 10.4 },
-      { f: 329.63, d: 0.6, t: 11.05 },
-      { f: 293.66, d: 1.2, t: 11.7 },
-    ];
+      gain.gain.setValueAtTime(0, now);
+      gain.gain.linearRampToValueAtTime(0.15, now + 0.03);
+      gain.gain.exponentialRampToValueAtTime(0.0001, now + 1.0);
 
-    notes.forEach((n) => {
-      this.playTone(n.f, n.d, n.t, "triangle");
-      this.playTone(n.f / 2, n.d * 0.9, n.t, "sine");
+      osc.connect(gain);
+      gain.connect(this.ctx.destination);
+
+      osc.start(now);
+      osc.stop(now + 1.0);
     });
+  }
+
+  // "Happy Birthday to You"
+  public playHappyBirthdayMelody() {
+    this.playTrack(2); // Switches to Birthday track
   }
 }
 
