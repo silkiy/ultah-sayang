@@ -11,22 +11,22 @@ export interface SongTrack {
 export const PLAYLIST: SongTrack[] = [
   {
     id: "penjaga-hati",
-    title: "Penjaga Hati (Acoustic)",
+    title: "Penjaga Hati",
     artist: "Nadhif Basalamah",
-    src: "/audio/penjaga-hati.wav",
+    src: "/audio/penjaga-hati.mp3",
     durationText: "03:45",
   },
   {
     id: "promise",
-    title: "Promise (Vintage Jazz)",
+    title: "Promise",
     artist: "Laufey",
-    src: "/audio/promise.wav",
+    src: "/audio/promise.mp3",
     durationText: "03:54",
   },
   {
     id: "birthday-piano",
-    title: "Happy Birthday (Acoustic Serenade)",
-    artist: "Piano Studio",
+    title: "Happy Birthday to You",
+    artist: "Acoustic Serenade",
     src: "/audio/birthday-piano.wav",
     durationText: "02:30",
   },
@@ -50,7 +50,7 @@ class BirthdaySoundEngine {
     if (!this.audioElement && typeof window !== "undefined") {
       this.audioElement = new Audio();
       this.audioElement.loop = true;
-      this.audioElement.volume = 0.85;
+      this.audioElement.volume = 0.9;
 
       this.audioElement.addEventListener("play", () => {
         this.isPlaying = true;
@@ -64,6 +64,19 @@ class BirthdaySoundEngine {
 
       this.audioElement.addEventListener("ended", () => {
         this.nextTrack();
+      });
+
+      // If MP3 fails (e.g. not found yet), fallback seamlessly to .wav version
+      this.audioElement.addEventListener("error", () => {
+        const track = PLAYLIST[this.currentTrackIndex];
+        if (track && track.src.endsWith(".mp3")) {
+          const fallbackSrc = track.src.replace(".mp3", ".wav");
+          console.info(`Switching from ${track.src} to ${fallbackSrc}`);
+          if (this.audioElement && this.audioElement.src !== fallbackSrc) {
+            this.audioElement.src = fallbackSrc;
+            this.audioElement.play().catch(() => {});
+          }
+        }
       });
     }
   }
@@ -134,10 +147,12 @@ class BirthdaySoundEngine {
             this.isPlaying = true;
             this.notify();
           })
-          .catch((err) => {
-            console.warn("Audio play prevented:", err);
-            this.isPlaying = false;
-            this.notify();
+          .catch(() => {
+            // Try fallback .wav
+            if (this.audioElement && track.src.endsWith(".mp3")) {
+              this.audioElement.src = track.src.replace(".mp3", ".wav");
+              this.audioElement.play().catch(() => {});
+            }
           });
       }
     }
@@ -186,7 +201,6 @@ class BirthdaySoundEngine {
     this.notify();
   }
 
-  // UI tone generator
   public playTone(freq: number, duration: number = 0.5, delay: number = 0, type: OscillatorType = "sine") {
     if (this.isMuted) return;
     this.initContext();
@@ -214,7 +228,6 @@ class BirthdaySoundEngine {
     }
   }
 
-  // Turntable needle drop sound effect
   public playNeedleDrop() {
     if (this.isMuted) return;
     this.initContext();
@@ -242,7 +255,6 @@ class BirthdaySoundEngine {
     }
   }
 
-  // Sound effect of blowing out candle
   public playCandleBlowSound() {
     if (this.isMuted) return;
     this.initContext();
@@ -285,7 +297,6 @@ class BirthdaySoundEngine {
     }
   }
 
-  // Celebratory chime
   public playCelebrationChime() {
     if (this.isMuted) return;
     this.initContext();
@@ -313,9 +324,8 @@ class BirthdaySoundEngine {
     });
   }
 
-  // "Happy Birthday to You"
   public playHappyBirthdayMelody() {
-    this.playTrack(2); // Switches to Birthday track
+    this.playTrack(2);
   }
 }
 
