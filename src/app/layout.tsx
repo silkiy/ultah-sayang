@@ -1,22 +1,24 @@
 import type { Metadata } from "next";
-import { Plus_Jakarta_Sans, Lora, Caveat, Playfair_Display } from "next/font/google";
+import { Plus_Jakarta_Sans, Cormorant_Garamond, Playfair_Display, Caveat } from "next/font/google";
 import "./globals.css";
 
-const plusJakarta = Plus_Jakarta_Sans({
+const sans = Plus_Jakarta_Sans({
   subsets: ["latin"],
   variable: "--font-sans",
   display: "swap",
 });
 
-const lora = Lora({
+const cormorant = Cormorant_Garamond({
   subsets: ["latin"],
-  variable: "--font-serif",
+  variable: "--font-cormorant",
+  weight: ["300", "400", "500", "600", "700"],
+  style: ["normal", "italic"],
   display: "swap",
 });
 
 const playfair = Playfair_Display({
   subsets: ["latin"],
-  variable: "--font-display",
+  variable: "--font-serif",
   display: "swap",
 });
 
@@ -27,8 +29,8 @@ const caveat = Caveat({
 });
 
 export const metadata: Metadata = {
-  title: "Selamat Ulang Tahun, Sayangku! ✨🎂",
-  description: "Sebuah kejutan dan hadiah spesial untuk hari ulang tahunmu • 08 September 2026",
+  title: "08.09.2026 — Special Edition for You",
+  description: "A thoughtful birthday editorial & curated memories • 08 September 2026",
   icons: {
     icon: "/favicon.ico",
   },
@@ -42,9 +44,9 @@ export default function RootLayout({
   return (
     <html
       lang="id"
-      className={`${plusJakarta.variable} ${lora.variable} ${playfair.variable} ${caveat.variable} scroll-smooth`}
+      className={`${sans.variable} ${cormorant.variable} ${playfair.variable} ${caveat.variable} scroll-smooth`}
     >
-      <body className="font-sans antialiased bg-[#0f0c1b] text-[#f5f3fa] selection:bg-[#ff5e8e] selection:text-white min-h-screen">
+      <body className="font-sans antialiased bg-[#FAF8F5] text-[#24211E] selection:bg-[#D4A373] selection:text-white min-h-screen">
         {children}
       </body>
     </html>

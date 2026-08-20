@@ -1,53 +1,47 @@
 "use client";
 
-import React, { useState } from "react";
-import { BirthdayCountdownGate } from "@/components/BirthdayCountdownGate";
-import { BirthdayHero } from "@/components/BirthdayHero";
-import { InteractiveCake } from "@/components/InteractiveCake";
-import { LanternWishSky } from "@/components/LanternWishSky";
-import { LoveCoupons } from "@/components/LoveCoupons";
-import { BirthdayLetter } from "@/components/BirthdayLetter";
-import { BirthdayGallery } from "@/components/BirthdayGallery";
-import { DirectBirthdayReplyForm } from "@/components/DirectBirthdayReplyForm";
-import { BirthdayAudioWidget } from "@/components/BirthdayAudioWidget";
+import React from "react";
+import { EditorialHero } from "@/components/EditorialHero";
+import { ArtisanalCandle } from "@/components/ArtisanalCandle";
+import { OrigamiStarJar } from "@/components/OrigamiStarJar";
+import { EditorialLetter } from "@/components/EditorialLetter";
+import { EditorialLookbook } from "@/components/EditorialLookbook";
+import { EmbossedVouchers } from "@/components/EmbossedVouchers";
+import { MinimalistReplyForm } from "@/components/MinimalistReplyForm";
+import { AudioController } from "@/components/AudioController";
 
 export default function Home() {
-  const [isUnlocked, setIsUnlocked] = useState(false);
-
   return (
-    <main className="relative min-h-screen bg-[#0d091a] text-[#f4effc] overflow-x-hidden pb-20 selection:bg-[#ff5e8e] selection:text-white">
-      {/* Midnight Unlock / Countdown Gate */}
-      <BirthdayCountdownGate
-        isUnlocked={isUnlocked}
-        onUnlock={() => setIsUnlocked(true)}
-      />
+    <main className="relative min-h-screen linen-bg text-[#24211E] overflow-x-hidden selection:bg-[#D4A373] selection:text-white pb-20">
+      
+      {/* 1. Cover Story & Interactive Vinyl Turntable */}
+      <EditorialHero />
 
-      {/* Main Content Area (shown when unlocked) */}
-      <div className="relative z-10 space-y-8 sm:space-y-12">
-        {/* Celebratory Hero */}
-        <BirthdayHero />
+      {/* 2. The Birthday Wish & Artisanal Candle Ritual */}
+      <ArtisanalCandle />
 
-        {/* 1. Interactive Birthday Cake & Candle Blow */}
-        <InteractiveCake />
+      {/* 3. The Apothecary Star Jar (15 Love Reasons) */}
+      <OrigamiStarJar />
 
-        {/* 2. Make a Wish & Sky Lantern Release */}
-        <LanternWishSky />
+      {/* 4. The Intimate Birthday Letter */}
+      <EditorialLetter />
 
-        {/* 3. Birthday Love Coupons & Vouchers */}
-        <LoveCoupons />
+      {/* 5. 20-Photo Curated Editorial Lookbook */}
+      <EditorialLookbook />
 
-        {/* 4. Special Handwritten Birthday Letter */}
-        <BirthdayLetter />
+      {/* 6. Curated Embossed Love Tokens / Vouchers */}
+      <EmbossedVouchers />
 
-        {/* 5. 20-Photo Memory Album & Moments */}
-        <BirthdayGallery />
+      {/* 7. Direct Note Card (WhatsApp Reply) */}
+      <MinimalistReplyForm />
 
-        {/* 6. Direct Manual Reply Note Form to WhatsApp */}
-        <DirectBirthdayReplyForm />
-      </div>
+      {/* 8. Minimalist Audio Controller */}
+      <AudioController />
 
-      {/* Persistent Floating Acoustic Piano Player */}
-      <BirthdayAudioWidget />
+      {/* Editorial Footer */}
+      <footer className="w-full max-w-5xl mx-auto px-4 py-8 mt-12 border-t border-[#E8E2D8] text-center text-xs text-[#8C8479] font-sans">
+        <p>© 2026 Crafted with love for 08.09.2026 • Edition N° 080926</p>
+      </footer>
     </main>
   );
 }
