@@ -2,12 +2,13 @@
 
 import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { Disc3, Play, Pause, Sparkles, ArrowDown } from "lucide-react";
+import { Disc3, Play, Pause, SkipForward, SkipBack, Music, Sparkles } from "lucide-react";
 import { BIRTHDAY_CONFIG } from "@/lib/birthday-data";
-import { soundEngine } from "@/lib/birthday-sound";
+import { soundEngine, SongTrack, PLAYLIST } from "@/lib/birthday-sound";
 
 export function EditorialHero() {
   const [isPlaying, setIsPlaying] = useState(false);
+  const [currentTrack, setCurrentTrack] = useState<SongTrack>(PLAYLIST[0]);
   const [timeLeft, setTimeLeft] = useState({
     days: 0,
     hours: 0,
@@ -16,6 +17,12 @@ export function EditorialHero() {
   });
 
   useEffect(() => {
+    // Subscribe to sound engine state
+    const unsubscribe = soundEngine.subscribe((playing, track) => {
+      setIsPlaying(playing);
+      setCurrentTrack(track);
+    });
+
     const calculateTime = () => {
       const target = new Date(BIRTHDAY_CONFIG.targetDate).getTime();
       const now = new Date().getTime();
@@ -34,17 +41,23 @@ export function EditorialHero() {
 
     calculateTime();
     const interval = setInterval(calculateTime, 1000);
-    return () => clearInterval(interval);
+
+    return () => {
+      unsubscribe();
+      clearInterval(interval);
+    };
   }, []);
 
-  const toggleMusic = () => {
-    if (isPlaying) {
-      soundEngine.stopAmbient();
-      setIsPlaying(false);
-    } else {
-      soundEngine.startAmbient();
-      setIsPlaying(true);
-    }
+  const handleToggleMusic = () => {
+    soundEngine.togglePlay();
+  };
+
+  const handleNextTrack = () => {
+    soundEngine.nextTrack();
+  };
+
+  const handlePrevTrack = () => {
+    soundEngine.prevTrack();
   };
 
   return (
@@ -75,42 +88,89 @@ export function EditorialHero() {
         </p>
       </div>
 
-      {/* Interactive Turntable & Live Countdown Strip */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-center bg-white p-6 sm:p-8 rounded-2xl border border-[#E8E2D8] shadow-xs">
+      {/* Interactive Turntable Vinyl & Countdown Strip */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-center bg-white p-6 sm:p-8 rounded-3xl border border-[#E8E2D8] shadow-xs">
         
-        {/* Left: Minimalist Vinyl Record Widget */}
-        <div className="flex items-center gap-4">
+        {/* Left: Vintage Vinyl Turntable Player */}
+        <div className="flex items-center gap-5">
+          {/* Rotating Vinyl Record */}
           <div
-            onClick={toggleMusic}
-            className={`relative w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-[#1A1715] flex items-center justify-center cursor-pointer shadow-md transition-transform ${
+            onClick={handleToggleMusic}
+            role="button"
+            tabIndex={0}
+            aria-label="Putar piringan hitam"
+            onKeyDown={(e) => {
+              if (e.key === "Enter" || e.key === " ") handleToggleMusic();
+            }}
+            className={`relative w-20 h-20 sm:w-24 sm:h-24 rounded-full bg-[#181514] flex items-center justify-center cursor-pointer shadow-lg transition-transform focus:ring-2 focus:ring-[#A67C52] shrink-0 ${
               isPlaying ? "spin-vinyl" : "hover:scale-105"
             }`}
           >
-            {/* Vinyl Grooves */}
-            <div className="absolute inset-2 rounded-full border border-gray-700/60" />
-            <div className="absolute inset-4 rounded-full border border-gray-700/40" />
+            {/* Vinyl Grooves Texture */}
+            <div className="absolute inset-2.5 rounded-full border border-neutral-700/50" />
+            <div className="absolute inset-5 rounded-full border border-neutral-700/40" />
+            <div className="absolute inset-7 rounded-full border border-neutral-700/30" />
+            
             {/* Center Label */}
-            <div className="w-6 h-6 rounded-full bg-[#D4A373] border-2 border-white flex items-center justify-center">
-              <div className="w-1.5 h-1.5 rounded-full bg-[#1A1715]" />
+            <div className="w-8 h-8 rounded-full bg-[#D4A373] border-2 border-white flex items-center justify-center shadow-inner">
+              <div className="w-2 h-2 rounded-full bg-[#1A1715]" />
             </div>
           </div>
 
-          <div>
+          {/* Track Info & Control Buttons */}
+          <div className="flex-1 min-w-0">
             <div className="flex items-center gap-2">
-              <span className="text-xs font-semibold uppercase tracking-wider text-[#1A1715]">
-                Acoustic Melody
+              <span className="text-[10px] font-bold tracking-widest uppercase text-[#A67C52] bg-[#FAF5EE] px-2 py-0.5 rounded-full border border-[#EAE3D8]">
+                {isPlaying ? "Now Playing" : "Vinyl Record"}
               </span>
-              <span className="w-1.5 h-1.5 rounded-full bg-[#A67C52] animate-ping" />
+              {isPlaying && (
+                <span className="w-2 h-2 rounded-full bg-[#27AE60] animate-pulse" />
+              )}
             </div>
-            <p className="text-xs text-[#7D766D] mt-0.5">
-              {isPlaying ? "Sedang memutar melodi piano..." : "Klik piringan hitam untuk memutar"}
+
+            <h4 className="font-cormorant text-xl font-medium text-[#1A1715] truncate mt-1">
+              {currentTrack.title}
+            </h4>
+            <p className="text-xs text-[#7D766D] font-sans truncate">
+              {currentTrack.artist}
             </p>
-            <button
-              onClick={toggleMusic}
-              className="mt-2 text-xs font-medium text-[#A67C52] hover:text-[#805B38] underline underline-offset-4 cursor-pointer"
-            >
-              {isPlaying ? "Jeda Musik" : "Putar Musik 🎵"}
-            </button>
+
+            {/* Playback Action Buttons */}
+            <div className="flex items-center gap-3 mt-3">
+              <button
+                onClick={handlePrevTrack}
+                aria-label="Lagu sebelumnya"
+                className="p-1.5 rounded-full hover:bg-[#FAF8F5] text-[#736B63] hover:text-[#1A1715] transition-colors cursor-pointer"
+              >
+                <SkipBack className="w-3.5 h-3.5" />
+              </button>
+
+              <button
+                onClick={handleToggleMusic}
+                aria-label={isPlaying ? "Jeda lagu" : "Putar lagu"}
+                className="px-3.5 py-1.5 rounded-full bg-[#1A1715] hover:bg-[#2D2824] text-white text-xs font-semibold uppercase tracking-wider transition-all cursor-pointer inline-flex items-center gap-1.5 active:scale-95 shadow-2xs"
+              >
+                {isPlaying ? (
+                  <>
+                    <Pause className="w-3 h-3" />
+                    <span>Jeda</span>
+                  </>
+                ) : (
+                  <>
+                    <Play className="w-3 h-3 fill-white" />
+                    <span>Putar</span>
+                  </>
+                )}
+              </button>
+
+              <button
+                onClick={handleNextTrack}
+                aria-label="Lagu selanjutnya"
+                className="p-1.5 rounded-full hover:bg-[#FAF8F5] text-[#736B63] hover:text-[#1A1715] transition-colors cursor-pointer"
+              >
+                <SkipForward className="w-3.5 h-3.5" />
+              </button>
+            </div>
           </div>
         </div>
 
