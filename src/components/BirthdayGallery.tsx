@@ -41,6 +41,24 @@ export function BirthdayGallery() {
     triggerHeartRain();
   };
 
+  React.useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (selectedPhotoIndex === null) return;
+      if (e.key === "Escape") {
+        setSelectedPhotoIndex(null);
+      } else if (e.key === "ArrowRight") {
+        setSelectedPhotoIndex((prev) => (prev !== null ? (prev + 1) % BIRTHDAY_PHOTOS.length : 0));
+      } else if (e.key === "ArrowLeft") {
+        setSelectedPhotoIndex((prev) =>
+          prev !== null ? (prev - 1 + BIRTHDAY_PHOTOS.length) % BIRTHDAY_PHOTOS.length : 0
+        );
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [selectedPhotoIndex]);
+
   const rotations = ["-rotate-1", "rotate-1", "-rotate-2", "rotate-2", "-rotate-1", "rotate-1"];
 
   return (
@@ -113,7 +131,8 @@ export function BirthdayGallery() {
               {/* Close Button */}
               <button
                 onClick={() => setSelectedPhotoIndex(null)}
-                className="absolute top-4 right-4 p-2 rounded-full bg-white/90 hover:bg-white text-[#5c4036] transition-all cursor-pointer z-20 shadow-xs"
+                aria-label="Tutup modal foto"
+                className="absolute top-4 right-4 p-2 rounded-full bg-white/90 hover:bg-white text-[#5c4036] transition-all cursor-pointer z-20 shadow-xs focus:ring-2 focus:ring-[#b94242]"
               >
                 <X className="w-4 h-4" />
               </button>
@@ -128,13 +147,15 @@ export function BirthdayGallery() {
 
                 <button
                   onClick={handlePrev}
-                  className="absolute left-3 top-1/2 -translate-y-1/2 p-2.5 rounded-full bg-white/80 hover:bg-white text-[#4a322b] shadow-md transition-all cursor-pointer"
+                  aria-label="Foto sebelumnya"
+                  className="absolute left-3 top-1/2 -translate-y-1/2 p-2.5 rounded-full bg-white/80 hover:bg-white text-[#4a322b] shadow-md transition-all cursor-pointer focus:ring-2 focus:ring-[#b94242]"
                 >
                   <ChevronLeft className="w-5 h-5" />
                 </button>
                 <button
                   onClick={handleNext}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 p-2.5 rounded-full bg-white/80 hover:bg-white text-[#4a322b] shadow-md transition-all cursor-pointer"
+                  aria-label="Foto selanjutnya"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 p-2.5 rounded-full bg-white/80 hover:bg-white text-[#4a322b] shadow-md transition-all cursor-pointer focus:ring-2 focus:ring-[#b94242]"
                 >
                   <ChevronRight className="w-5 h-5" />
                 </button>

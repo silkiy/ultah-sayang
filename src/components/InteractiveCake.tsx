@@ -59,7 +59,17 @@ export function InteractiveCake() {
         {/* CANDLES ROW */}
         <div className="flex items-end justify-center gap-8 sm:gap-12 z-20 -mb-2">
           {candlesLit.map((isLit, idx) => (
-            <div key={idx} className="relative flex flex-col items-center cursor-pointer" onClick={handleBlowCandles}>
+            <div
+              key={idx}
+              role="button"
+              tabIndex={0}
+              aria-label={`Lilin nomor ${idx + 1}, klik untuk meniup lilin`}
+              onKeyDown={(e) => {
+                if (e.key === "Enter" || e.key === " ") handleBlowCandles();
+              }}
+              className="relative flex flex-col items-center cursor-pointer focus:outline-none focus:ring-2 focus:ring-[#ff7675] rounded-lg"
+              onClick={handleBlowCandles}
+            >
               {/* Flame or Smoke */}
               <div className="h-10 flex items-center justify-center">
                 {isLit ? (
