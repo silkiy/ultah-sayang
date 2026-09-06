@@ -10,17 +10,24 @@ export interface SongTrack {
 
 export const PLAYLIST: SongTrack[] = [
   {
+    id: "semua-aku-dirayakan",
+    title: "Semua Aku Dirayakan",
+    artist: "Nadin Amizah",
+    src: "/audio/semua-aku-dirayakan.mp3",
+    durationText: "05:14",
+  },
+  {
     id: "penjaga-hati",
     title: "Penjaga Hati",
     artist: "Nadhif Basalamah",
     src: "/audio/penjaga-hati.mp3",
-    durationText: "03:45",
+    durationText: "04:18",
   },
   {
     id: "promise",
     title: "Promise",
     artist: "Laufey",
-    src: "/audio/promise.mp3",
+    src: "/audio/promise.wav",
     durationText: "03:54",
   },
   {
@@ -325,7 +332,8 @@ class BirthdaySoundEngine {
   }
 
   public playHappyBirthdayMelody() {
-    this.playTrack(2);
+    const idx = PLAYLIST.findIndex((t) => t.id === "birthday-piano");
+    this.playTrack(idx !== -1 ? idx : PLAYLIST.length - 1);
   }
 }
 

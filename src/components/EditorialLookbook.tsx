@@ -10,14 +10,17 @@ export function EditorialLookbook() {
   const [selectedPhotoIndex, setSelectedPhotoIndex] = useState<number | null>(null);
   const [activeFilter, setActiveFilter] = useState<"all" | "portraits" | "moments" | "details">("all");
   const [likes, setLikes] = useState<{ [key: number]: number }>({});
+  const [displayLimit, setDisplayLimit] = useState(24);
 
   const filteredPhotos = activeFilter === "all"
     ? EDITORIAL_PHOTOS
     : EDITORIAL_PHOTOS.filter((p) => p.category === activeFilter);
 
+  const visiblePhotos = filteredPhotos.slice(0, displayLimit);
+
   const handleOpenPhoto = (idx: number) => {
     // Find index in main EDITORIAL_PHOTOS
-    const realIndex = EDITORIAL_PHOTOS.findIndex((p) => p.id === filteredPhotos[idx].id);
+    const realIndex = EDITORIAL_PHOTOS.findIndex((p) => p.id === visiblePhotos[idx].id);
     setSelectedPhotoIndex(realIndex);
     soundEngine.playTone(440, 0.2, 0, "sine");
   };
@@ -70,7 +73,7 @@ export function EditorialLookbook() {
           Album Potret & Kenangan Bersamamu
         </h3>
         <p className="text-xs sm:text-sm text-[#736B63] mt-2 font-sans leading-relaxed">
-          Kumpulan 20 foto dan momen terbaik yang telah kita lewati sejak awal bersama.
+          Kumpulan {EDITORIAL_PHOTOS.length} potret dan momen manis perjalanan cinta kita bersama.
         </p>
 
         {/* Filter Pills */}
@@ -83,7 +86,10 @@ export function EditorialLookbook() {
           ].map((tab) => (
             <button
               key={tab.key}
-              onClick={() => setActiveFilter(tab.key as any)}
+              onClick={() => {
+                setActiveFilter(tab.key as any);
+                setDisplayLimit(24);
+              }}
               className={`px-4 py-1.5 rounded-full text-xs font-medium transition-all cursor-pointer ${
                 activeFilter === tab.key
                   ? "bg-[#1A1715] text-white"
@@ -98,7 +104,7 @@ export function EditorialLookbook() {
 
       {/* Editorial Grid Layout */}
       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6">
-        {filteredPhotos.map((photo, idx) => (
+        {visiblePhotos.map((photo, idx) => (
           <motion.div
             key={photo.id}
             initial={{ opacity: 0, y: 15 }}
@@ -114,6 +120,8 @@ export function EditorialLookbook() {
               <img
                 src={photo.src}
                 alt={photo.title}
+                loading="lazy"
+                decoding="async"
                 className="w-full h-full object-cover group-hover:scale-103 transition-transform duration-500"
               />
             </div>
@@ -131,7 +139,7 @@ export function EditorialLookbook() {
 
               <button
                 onClick={(e) => handleLike(e, photo.id)}
-                className="p-1.5 rounded-full hover:bg-[#FAF5EE] text-[#8C8479] hover:text-[#C26D6D] transition-colors"
+                className="p-1.5 rounded-full hover:bg-[#FAF5EE] text-[#8C8479] hover:text-[#C26D6D] transition-colors cursor-pointer"
               >
                 <Heart className={`w-3.5 h-3.5 ${likes[photo.id] ? "fill-[#C26D6D] text-[#C26D6D]" : ""}`} />
               </button>
@@ -139,6 +147,19 @@ export function EditorialLookbook() {
           </motion.div>
         ))}
       </div>
+
+      {/* Load More Button */}
+      {displayLimit < filteredPhotos.length && (
+        <div className="mt-10 text-center">
+          <button
+            onClick={() => setDisplayLimit((prev) => prev + 24)}
+            className="px-6 py-2.5 rounded-full bg-white hover:bg-[#FAF8F5] border border-[#D5CEC2] text-xs font-medium tracking-wide text-[#1A1715] shadow-xs hover:shadow-md transition-all cursor-pointer inline-flex items-center gap-2"
+          >
+            <span>Tampilkan Lebih Banyak ({visiblePhotos.length} dari {filteredPhotos.length} foto)</span>
+            <Sparkles className="w-3.5 h-3.5 text-[#D4A373]" />
+          </button>
+        </div>
+      )}
 
       {/* FULLSCREEN LIGHTBOX MODAL */}
       <AnimatePresence>

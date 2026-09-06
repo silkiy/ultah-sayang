@@ -66,7 +66,7 @@ export function EditorialHero() {
       {/* Top Editorial Bar */}
       <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pb-6 border-b border-[#E8E2D8] text-[11px] tracking-widest uppercase font-medium text-[#7D766D]">
         <span>{BIRTHDAY_CONFIG.editionTag}</span>
-        <span>08 SEPTEMBER 2026 • JAKARTA</span>
+        <span>08 SEPTEMBER 2026 • {BIRTHDAY_CONFIG.location}</span>
         <span>TOGETHER SINCE 16.01.2026</span>
       </div>
 
