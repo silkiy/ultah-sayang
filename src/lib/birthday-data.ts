@@ -37,15 +37,15 @@ export const BIRTHDAY_CONFIG = {
 };
 
 export const EDITORIAL_LETTER = {
-  headline: "Selamat Ulang Tahun, Rumahku.",
+  headline: "Selamat Ulang Tahun, Rumah & Doaku.",
   editionInfo: "Edisi Khusus • 08 September 2026",
   paragraphs: [
     "Selamat ulang tahun ya, Sayangku tercinta.",
-    "Hari ini adalah salah satu hari yang paling aku syukuri di hidupku, karena di tanggal 8 September ini, orang yang paling baik, paling manis, dan paling aku sayangi lahir ke dunia.",
-    "Terima kasih banyak ya sudah lahir dan tumbuh jadi sosok yang begitu menyenangkan. Sejak 16 Januari lalu kita mulai melangkah bersama, hariku yang tadinya biasa aja berubah jadi selalu punya alasan buat pulang dan tersenyum. Bersamamu, aku nggak pernah merasa harus berpura-pura—aku bisa jadi diriku sendiri seutuhnya.",
-    "Di usiamu yang baru ini, doa aku sederhana tapi tulus dari lubuk hati: semoga kamu selalu diberikan kesehatan, dilindungi dari segala hal yang melelahkan, dan dimudahkan semua impian serta rencana baik yang sedang kamu perjuangkan. Apapun yang terjadi di luar sana, ingat ya, kamu selalu punya aku yang bakal siap sedia mendengarkan dan mendukungmu.",
-    "Jangan pernah ragu sama dirimu sendiri. Kamu hebat, kamu berharga, dan kamu selalu istimewa di mataku. Terima kasih sudah memilih bertahan dan menemaniku sejauh ini.",
-    "Selamat bertambah usia, Sayang. Mari kita terus jalan bareng, bikin lebih banyak cerita seru, dan lewati setiap hari ke depan dengan saling menjaga. Aku sayang banget sama kamu, hari ini, besok, dan seterusnya.",
+    "Waktu aku ulang tahun kemarin, aku ingat banget kamu sempat kirim pesan panjang. Kamu bilang kalau kamu sering mikir gimana ya jalannya takdir sampai akhirnya kita berdua bisa dipertemukan, dan kamu bilang kalau mencintaiku adalah keputusan paling membahagiakan yang pernah kamu ambil.",
+    "Hari ini, di tanggal 8 September ini, gantian giliran aku yang mau ngomong langsung ke kamu: ketemu kamu adalah hal paling indah dan paling aku syukuri di hidup ini. Sejak 16 Januari lalu kita mulai jalan bareng—ke mana-mana berdua, ketawa lepas, cerita ngalor-ngidul nggak jelas sampai larut—hariku yang tadinya biasa aja beneran berubah jadi jauh lebih hangat dan selalu punya alasan buat pulang dan tersenyum.",
+    "Kamu selalu bilang aku pacar terbaik dan sempurna di matamu, padahal kenyataannya justru kamulah yang selalu bikin aku merasa cukup dan berharga. Aku juga minta maaf ya kalau selama ini masih banyak kurangnya, kadang bikin kesel atau belum bisa jadi yang paling sempurna. Tapi satu hal yang perlu kamu tahu: doa kamu buat ngarungi sisa waktu bareng aku itu, beneran jadi amin paling serius yang selalu aku langitkan setiap hari.",
+    "Di usia barumu ini, tetap jadi diri kamu ya. Tetap jadi si manis yang ceria, yang suka manja, dan nggak pernah pelit senyum. Kamu nggak perlu khawatir, aku nggak akan berubah—aku bakal terus ada di sini buat nemenin kamu, jagain kamu, dan sayang sama kamu hari ini, besok, dan seterusnya.",
+    "Selamat bertambah usia, Sayangku. I love you more than you'll ever know. (Peluk erat banget dari jauh 🫂💗)",
   ],
   signOff: "Dari seseorang yang selalu bersyukur memilikimu,",
   signature: "Sayang Kamu Selalu ❤️",

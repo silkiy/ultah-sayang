@@ -84,7 +84,7 @@ export function EditorialHero() {
         </h1>
 
         <p className="font-cormorant italic text-lg sm:text-xl text-[#59534E] max-w-lg mx-auto mt-6 leading-relaxed">
-          "Karena bersamamu, setiap hari adalah rumah yang paling tenang untuk ditinggali."
+          "Mengarungi sisa waktu bersamamu adalah doa yang selalu aku langitkan tanpa jemu."
         </p>
       </div>
 
